@@ -40,7 +40,12 @@ jobs:
         shell: bash
         run: |
           if [ "${{ matrix.target_platform }}" == "win-64" ]; then
-            echo "cxx_compiler_version: [192]" > variant_config.yaml
+            cat << 'EOF' > variant_config.yaml
+            c_compiler: [vs2019_win-64]
+            cxx_compiler: [vs2019_win-64]
+            c_compiler_version: ["192"]
+            cxx_compiler_version: ["192"]
+            EOF
             pixi exec rattler-build build --recipe recipe.yaml -m variant_config.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output
           else
             pixi exec rattler-build build --recipe recipe.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output
