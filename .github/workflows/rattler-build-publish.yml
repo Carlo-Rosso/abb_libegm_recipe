@@ -9,7 +9,6 @@ permissions:
 env:
   PREFIX_CHANNEL: iit-da
   PREFIX_API_KEY: ${{ secrets.PREFIX_DEV_TOKEN }}
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-and-publish:
@@ -40,12 +39,10 @@ jobs:
         shell: bash
         run: |
           if [ "${{ matrix.target_platform }}" == "win-64" ]; then
-            # Niente più suffissi, scriviamo solo "vs2022". Conda farà il resto.
             echo 'c_compiler: [vs2022]' > variant_config.yaml
             echo 'cxx_compiler: [vs2022]' >> variant_config.yaml
             pixi exec rattler-build build --recipe recipe.yaml -m variant_config.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output
           else
-            # Su Linux e ARM compiliamo normalmente
             pixi exec rattler-build build --recipe recipe.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output
           fi
 
