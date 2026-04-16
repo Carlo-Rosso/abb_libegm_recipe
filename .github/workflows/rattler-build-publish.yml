@@ -9,6 +9,7 @@ permissions:
 env:
   PREFIX_CHANNEL: iit-da
   PREFIX_API_KEY: ${{ secrets.PREFIX_DEV_TOKEN }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-and-publish:
@@ -22,7 +23,6 @@ jobs:
             target_platform: linux-64
           - os: windows-latest
             target_platform: win-64
-          # Macchina ARM nativa
           - os: ubuntu-24.04-arm
             target_platform: linux-aarch64
 
@@ -40,13 +40,10 @@ jobs:
         shell: bash
         run: |
           if [ "${{ matrix.target_platform }}" == "win-64" ]; then
-            echo 'c_compiler: [vs2019]' > variant_config.yaml
-            echo 'cxx_compiler: [vs2019]' >> variant_config.yaml
-            echo 'c_compiler_version: ["192"]' >> variant_config.yaml
-            echo 'cxx_compiler_version: ["192"]' >> variant_config.yaml
+            echo 'c_compiler: [vs2022_win-64]' > variant_config.yaml
+            echo 'cxx_compiler: [vs2022_win-64]' >> variant_config.yaml
             pixi exec rattler-build build --recipe recipe.yaml -m variant_config.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output
           else
-            # Su Linux e ARM compiliamo normalmente
             pixi exec rattler-build build --recipe recipe.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output
           fi
 
