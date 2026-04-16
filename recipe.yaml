@@ -1,6 +1,6 @@
 context:
   name: abb_libegm
-  version: 1.0.1 # O la versione della release GitHub
+  version: 1.0.0
 
 package:
   name: ${{ name }}
@@ -9,18 +9,17 @@ package:
 source:
   git: https://github.com/ros-industrial/abb_libegm
   rev: 2c9350abfb67131cae796805fed8cd6eeb2ab7f9
-  # rattler-build scarica ed estrae il codice in automatico
 
 build:
   number: 0
 
 requirements:
   build:
-    - ${{ compiler('cxx') }} # Usa il compilatore corretto per la piattaforma corrente
+    - ${{ compiler('cxx') }}
     - cmake
     - ninja
   host:
-    - libprotobuf 3.21.* # La dipendenza fondamentale per EGM
+    - libprotobuf 3.21.* # main dependency for ABB EGM
     - boost
   run:
     - libprotobuf 3.21.*

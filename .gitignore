@@ -1,0 +1,31 @@
+# Build outputs
+build/
+dist/
+
+# Conda/Rattler packages
+*.tar.bz2
+*.conda
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+.venv/
+venv/
+
+# Editor and OS files
+.idea/
+.DS_Store
+Thumbs.db
+
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+/output

@@ -1,0 +1,51 @@
+name: Build and Publish Conda Packages
+
+# Fa partire la build SOLO quando clicchi "Run workflow" dalla tab Actions di GitHub
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Definiamo canale e token una volta sola qui in alto
+env:
+  PREFIX_CHANNEL: iit-da
+  PREFIX_API_KEY: ${{ secrets.PREFIX_DEV_TOKEN }}
+
+jobs:
+  build-and-publish:
+    name: ${{ matrix.target_platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # Se Windows esplode, Linux continua a lavorare
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target_platform: linux-64
+          - os: windows-latest
+            target_platform: win-64
+          # Macchina ARM64 nativa di GitHub (Il vero game-changer per il Jetson)
+          - os: ubuntu-24.04-arm
+            target_platform: linux-aarch64
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          pixi-version: v0.39.0
+
+      - name: Build recipe
+        shell: bash
+        run: |
+          pixi exec rattler-build build --recipe recipe.yaml \
+            --target-platform "${{ matrix.target_platform }}" \
+            --output-dir output
+
+      - name: Upload to prefix.dev
+        shell: bash
+        run: |
+          # Carica i pacchetti usando le variabili d'ambiente definite in alto
+          pixi exec rattler-build upload prefix -c "${PREFIX_CHANNEL}" "output/**/*.conda"
