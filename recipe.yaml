@@ -22,4 +22,3 @@ requirements:
     - libprotobuf 3.21.* # main dependency for ABB EGM
     - boost
   run:
-    - libbost
