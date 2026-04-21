@@ -35,16 +35,39 @@ jobs:
           pixi-version: v0.39.0
           run-install: false
 
+      - name: Debug Build Context
+        shell: bash
+        run: |
+          set -x
+          echo "Runner OS: ${RUNNER_OS}"
+          echo "Target platform: ${{ matrix.target_platform }}"
+          pixi --version
+          pixi exec rattler-build --version
+          echo "Recipe content:"
+          cat recipe.yaml
+
       - name: Build recipe
         shell: bash
         run: |
+          set -o pipefail
+          LOG_FILE="rattler-build-${{ matrix.target_platform }}.log"
           if [ "${{ matrix.target_platform }}" == "win-64" ]; then
             echo 'c_compiler: [vs2022]' > variant_config.yaml
             echo 'cxx_compiler: [vs2022]' >> variant_config.yaml
-            pixi exec rattler-build build --recipe recipe.yaml -m variant_config.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output
+            echo "variant_config.yaml content:"
+            cat variant_config.yaml
+            pixi exec rattler-build build --recipe recipe.yaml -m variant_config.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output 2>&1 | tee "${LOG_FILE}"
           else
-            pixi exec rattler-build build --recipe recipe.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output
+            pixi exec rattler-build build --recipe recipe.yaml --target-platform "${{ matrix.target_platform }}" --output-dir output 2>&1 | tee "${LOG_FILE}"
           fi
+
+      - name: Upload Build Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rattler-build-log-${{ matrix.target_platform }}
+          path: rattler-build-${{ matrix.target_platform }}.log
+          if-no-files-found: warn
 
       - name: Upload to prefix.dev
         shell: bash
