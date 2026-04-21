@@ -20,6 +20,6 @@ requirements:
     - ninja
   host:
     - libprotobuf 3.21.* # main dependency for ABB EGM
-    - libboost
+    - boost
   run:
-    - libboost
+    - boost
